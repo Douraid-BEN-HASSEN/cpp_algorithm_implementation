@@ -1,24 +1,4 @@
-#include <iostream>
-#include "utils.h"
-
-using namespace std;
-
-vector<vector<int>> positionInterdite;
-vector<Color> tab;
-
-void init();
-void algo_Violation();
-int getNbViolation(int, Color);
-
-int nbViolation = 0;
-
-int main()
-{
-    init();
-
-    algo_Violation();
-
-}
+#include "algo_violation.h"
 
 void init() {
     positionInterdite = readCol("queen5_5.col");
@@ -60,4 +40,9 @@ int getNbViolation(int pCase, Color pColor) {
     }
 
     return nViolation;
+}
+
+int getNbViolation() 
+{
+    return nbViolation;
 }
