@@ -9,6 +9,7 @@ int nbViolation = 0;
 void init() {
     positionInterdite = readCol("queen5_5.col");
     std::fill_n(std::back_inserter(tab), getNbCase(), Color::EMPTY);
+
 }
 
 // +-------+
@@ -64,6 +65,22 @@ int countNbViolation(int pCase, Color pColor) {
     return nViolation;
 }
 
+int countNbViolation(vector<Color> pTab, int pCase, Color pColor) {
+    int nViolation = 0;
+    for (int iCase = 0; iCase < positionInterdite[pCase].size(); iCase++) {
+        if (pTab[positionInterdite[pCase][iCase]] == pColor) {
+            nViolation++;
+        }
+    }
+
+    return nViolation;
+}
+
+int getRandomNumber(int max)
+{
+    return rand()%max;
+}
+
 // +--------+
 // | GETTER |
 // +--------+
@@ -107,4 +124,120 @@ void algo_violation() {
     }
 
     nbViolation /= 2;
+}
+
+void algo_violation(vector<Color> pTab) {
+    // remplir la grille
+    int nbReinePlacee;
+    int nViolation = 0;
+
+    // compte nViolation
+    for (int iCase = 0; iCase < getNbCase(); iCase++) {
+        nViolation += countNbViolation(pTab, iCase, pTab[iCase]);
+    }
+
+    nViolation /= 2;
+}
+
+void algo_recuit()
+{
+    // etape 1 : init => remplir tab
+    int nRouge = 0;
+    int nJaune = 0;
+    int nVert = 0;
+    int nBleu = 0;
+    int nViolet = 0;
+    int nMax = 5;
+
+    while (!(nRouge == 5 && nJaune == 5 && nVert == 5 && nBleu == 5 && nViolet == 5))
+    {
+        if(nRouge < 5) {
+            Color color = Color::ROUGE;
+            int randomCase = getRandomNumber(getNbCase()-1);
+            if(tab[randomCase] == Color::EMPTY) {
+                tab[randomCase] = color;
+                nRouge++;
+            }
+        }
+        else if(nJaune < 5) {
+            Color color = Color::JAUNE;
+            int randomCase = getRandomNumber(getNbCase()-1);
+            if(tab[randomCase] == Color::EMPTY) {
+                tab[randomCase] = color;
+                nJaune++;
+            }
+        }
+        else if(nVert < 5) {
+            Color color = Color::VERT;
+            int randomCase = getRandomNumber(getNbCase()-1);
+            if(tab[randomCase] == Color::EMPTY) {
+                tab[randomCase] = color;
+                nVert++;
+            }
+        }
+        else if(nBleu < 5) {
+            Color color = Color::BLEU;
+            int randomCase = getRandomNumber(getNbCase()-1);
+            if(tab[randomCase] == Color::EMPTY) {
+                tab[randomCase] = color;
+                nBleu++;
+            }
+        }
+        else if(nViolet < 5) {
+            Color color = Color::VIOLET;
+            int randomCase = getRandomNumber(getNbCase()-1);
+            if(tab[randomCase] == Color::EMPTY) {
+                tab[randomCase] = color;
+                nViolet++;
+            }
+        }
+    }
+    
+    // etape 2
+    int random_value_1;
+    int random_value_2;
+
+    int nbIteration = 0;
+    srand(time(NULL));
+    while(nbIteration < 100 && getNbViolation() > 0)
+    {
+        vector<Color> tab_voisin1 = tab;
+        vector<Color> tab_voisin2 = tab;
+
+        int xc;
+        int x1;
+        int x2;
+        double temperature = 25.0;
+        
+        xc = getNbViolation(tab); // nb violation courante
+
+        // nb violation x1
+        random_value_1 = getRandomNumber(24);
+        random_value_2 = getRandomNumber(24);
+        Color color_tmp = tab_voisin1[random_value_1];
+        tab_voisin1[random_value_1] = tab_voisin1[random_value_2];
+        tab_voisin1[random_value_2] = color_tmp;
+        x1 = getNbViolation(tab_voisin1); // get nb violation sur tab_voisin1
+
+        // nb violation x2
+        random_value_1 = getRandomNumber(24);
+        random_value_2 = getRandomNumber(24);
+        Color color_tmp = tab_voisin2[random_value_1];
+        tab_voisin2[random_value_1] = tab_voisin2[random_value_2];
+        tab_voisin2[random_value_2] = color_tmp;
+        x2 = getNbViolation(tab_voisin2); // get nb violation sur tab_voisin2
+
+        if(x1 < xc)
+        {
+            tab = tab_voisin1;
+        }
+        else if(x2 > xc && ((double)(x2-xc)/temperature) < ((double)rand()/RAND_MAX))
+        {
+            tab = tab_voisin2;
+            temperature -= 0.1;
+        }
+        nbIteration++;
+    }
+
+    return 0;
 }

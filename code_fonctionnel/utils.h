@@ -24,6 +24,8 @@ void init();
 vector<vector<int>> readCol(const char*);
 vector<string> split(const string&, char);
 int countNbViolation(int, Color);
+int countNbViolation(vector<Color>, int, Color);
+int getRandomNumber(int);
 
 // +--------+
 // | GETTER |
@@ -36,6 +38,7 @@ vector<Color> getTab();
 // | ALGO |
 // +------+
 void algo_violation();
-
+void algo_violation(vector<Color>);
+void algo_recuit();
 
 
