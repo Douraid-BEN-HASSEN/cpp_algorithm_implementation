@@ -1,3 +1,30 @@
+#include <iostream>
+#include "utils.h"
+
+using namespace std;
+
+vector<vector<int>> positionInterdite;
+vector<Color> tab;
+
+void init();
+void algo_Violation();
+int getNbViolation(int, Color);
+
+int nbViolation = 0;
+
+int main()
+{
+    init();
+
+    algo_Violation();
+
+}
+
+void init() {
+    positionInterdite = readCol("queen5_5.col");
+    std::fill_n(std::back_inserter(tab), getNbCase(), Color::EMPTY);
+}
+
 void algo_Violation() {
     // remplir la grille
     int nbReinePlacee;
