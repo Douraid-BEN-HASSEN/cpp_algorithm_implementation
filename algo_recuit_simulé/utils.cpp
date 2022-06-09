@@ -75,7 +75,7 @@ int countNbViolation(vector<Color> pTab, int pCase, Color pColor) {
         }
     }
 
-    return nViolation;
+    return nViolation/2;
 }
 
 int getRandomNumber(int max)
@@ -243,7 +243,7 @@ void algo_recuit()
         for (int iCase = 0; iCase < getNbCase(); iCase++) {
             x2 += countNbViolation(tab_voisin2, iCase, tab_voisin2[iCase]);
         }
-
+        
         if (x1 < xc)
         {
             tab = tab_voisin1;
