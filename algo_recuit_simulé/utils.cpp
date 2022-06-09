@@ -251,7 +251,7 @@ void algo_recuit()
         else if (x2 > xc && ((double)(x2 - xc) / temperature) < ((double)rand() / RAND_MAX))
         {
             tab = tab_voisin2;
-            temperature -= 0.1;
+            temperature -= temperature * 0.99;
         }
         nbIteration++;
     }
