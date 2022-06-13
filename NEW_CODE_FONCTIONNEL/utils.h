@@ -31,6 +31,7 @@ vector<vector<int>> readCol(const char*);
 vector<string> split(const string&, char);
 int countNbViolation(int, Color);
 int countNbViolation(vector<Color>, int, Color);
+int countNbViolation(vector<Color>);
 int getRandomNumber(int);
 vector<Color> readOutput(const char*);
 
@@ -57,3 +58,6 @@ void algo_gsat();
 void algo_random_walk();
 
 void algo_recherche_tabou();
+
+vector<Color> algo_gww_random_walk(vector<Color>);
+void algo_gww();
