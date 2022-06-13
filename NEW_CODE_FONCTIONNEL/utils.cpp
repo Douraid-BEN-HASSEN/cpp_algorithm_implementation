@@ -372,8 +372,7 @@ void algo_gsat() {
     algo = "gsat";
 
     // prend le meilleur de algo_descente
-    // etape 1 : init => remplir tab
-    
+    // etape 1 : init => remplir tab    
 
     srand(time(NULL));
     bool remplie = false;
@@ -412,7 +411,7 @@ void algo_gsat() {
 
     int meilleur_solution_val = -1;
 
-    while (nbIteration < 10000 && x_courant > 0)
+    while (nbIteration < 100000 && x_courant > 0)
     {
         x_courant = 0;
         x_voisin = 0;
@@ -441,6 +440,8 @@ void algo_gsat() {
         {
             meilleur_solution = tab_voisin;
             meilleur_solution_val = x_voisin;
+            x_courant = x_voisin;
+            tab = tab_voisin;
         }
         else if ((double)rand() / RAND_MAX > 0.5)
         {
