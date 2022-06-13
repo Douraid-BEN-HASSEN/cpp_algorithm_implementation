@@ -21,7 +21,8 @@ int main()
     // algo_random_walk();
 
     // algo_recherche_tabou();    
-
+    algo_gww();
+    
     FileWrite(output_file_name);
 }
 
