@@ -206,6 +206,11 @@ void algo_recuit()
             }
         }
     }
+    
+    // melanger les cases
+    for (int iCase = 0; iCase < getNbCase(); iCase++) {
+
+    }
     // ------
 
     // etape 2
@@ -236,8 +241,8 @@ void algo_recuit()
         xc /= 2;
 
         // nb violation x1
-        random_value_1 = getRandomNumber(24);
-        random_value_2 = getRandomNumber(24);
+        random_value_1 = getRandomNumber(getNbCase()-1);
+        random_value_2 = getRandomNumber(getNbCase()-1);
         color_tmp = tab_voisin1[random_value_1];
         tab_voisin1[random_value_1] = tab_voisin1[random_value_2];
         tab_voisin1[random_value_2] = color_tmp;
@@ -248,8 +253,8 @@ void algo_recuit()
         x1 /= 2;
 
         // nb violation x2
-        random_value_1 = getRandomNumber(24);
-        random_value_2 = getRandomNumber(24);
+        random_value_1 = getRandomNumber(getNbCase() - 1);
+        random_value_2 = getRandomNumber(getNbCase() - 1);
         color_tmp = tab_voisin2[random_value_1];
         tab_voisin2[random_value_1] = tab_voisin2[random_value_2];
         tab_voisin2[random_value_2] = color_tmp;
@@ -332,8 +337,8 @@ void algo_descente() {
 
         Color color_tmp;
         // nb violation courante
-        random_value_1 = getRandomNumber(24);
-        random_value_2 = getRandomNumber(24);
+        random_value_1 = getRandomNumber(getNbCase() - 1);
+        random_value_2 = getRandomNumber(getNbCase() - 1);
         tab_voisin = tab;
         color_tmp = tab_voisin[random_value_1];
         tab_voisin[random_value_1] = tab_voisin[random_value_2];
@@ -420,8 +425,8 @@ void algo_gsat() {
 
         Color color_tmp;
         // nb violation courante
-        random_value_1 = getRandomNumber(24);
-        random_value_2 = getRandomNumber(24);
+        random_value_1 = getRandomNumber(getNbCase()-1);
+        random_value_2 = getRandomNumber(getNbCase()-1);
         tab_voisin = tab;
         color_tmp = tab_voisin[random_value_1];
         tab_voisin[random_value_1] = tab_voisin[random_value_2];
@@ -497,8 +502,8 @@ void algo_random_walk() {
 
         Color color_tmp;
         // nb violation courante
-        random_value_1 = getRandomNumber(24);
-        random_value_2 = getRandomNumber(24);
+        random_value_1 = getRandomNumber(getNbCase()-1);
+        random_value_2 = getRandomNumber(getNbCase()-1);
         color_tmp = voisin[random_value_1];
         voisin[random_value_1] = voisin[random_value_2];
         voisin[random_value_2] = color_tmp;
@@ -522,13 +527,11 @@ void algo_random_walk() {
     std::cout << "SOLUTION_COURANTE => " << meilleur_sol << endl;
 }
 
+// ok
 void algo_recherche_tabou() {
-    // ALGO A REVOIR
     algo = "algo recherche tabou";
 
-    // tire au hasard jusqu'à nErreur = 0 ou nbIteration > NMAX
     // etape 1 : init => remplir tab
-
     srand(time(NULL));
     bool remplie = false;
     while (!remplie) {
@@ -551,61 +554,84 @@ void algo_recherche_tabou() {
         }
     }
 
-    // etape 2 :
+    // etape 2 : traitement
     vector<Color> voisin;
-    vector<Color> grilleTabou;
-    std::fill_n(std::back_inserter(grilleTabou), getNbCase(), Color::EMPTY);
+    vector<vector<vector<Color>>> grilleTabou;
+    vector<vector<Color>> lVide1;
+    vector<Color> lVide2;
+    std::fill_n(std::back_inserter(lVide2), getNbCase(), Color::EMPTY);
+    for (int i = 0; i < getNbCase(); i++) {
+        grilleTabou.push_back(lVide1);
+    }
 
-    int nViolation = 999;
+    int nViolation = 999;    
+    int bestViol = 999;
     int nbIteration = 0;
 
-    while (nbIteration < 100 && nViolation > 0) {
-        int iBestCase;
+    while (nbIteration < 10000 && nViolation > 0) {
+        int iBestCase = -1;
+        int iBestGrille = -1;
         int bestVal = -1;
 
         // etape 1
+        // trouver la case avec le meilleur score en changeant les couleurs       
         for (int iCase = 0; iCase < getNbCase(); iCase++) {
                 voisin = tab;
 
                 Color originalColor = voisin[iCase];
-                Color bestColor = Color::EMPTY;
-                int bestViol = 999;
+                Color bestColor = Color::EMPTY;                
 
-                for (int iColor = 1; iColor < nCouleurDifferente; iColor++) {
-                    if (grilleTabou[iCase] != (Color)iColor) {
-                        if ((Color)iColor != originalColor) {
-                            int tmpNbViol = 0;
-                            voisin[iCase] = (Color)iColor;
+                while (bestColor == Color::EMPTY)
+                {
+                    bestColor = (Color)(1 + getRandomNumber(nCouleurDifferente));
+                    if (bestColor == originalColor) bestColor = Color::EMPTY;
+                }
 
-                            for (int iCaseTest = 0; iCaseTest < getNbCase(); iCaseTest++) {
-                                tmpNbViol += countNbViolation(voisin, iCaseTest, voisin[iCaseTest]);
-                            }
-                            tmpNbViol /= 2;
-
-                            if (tmpNbViol < bestViol) {
-                                grilleTabou[iCase] = (Color)iColor;
-                                bestViol = tmpNbViol;
-                                bestVal = bestViol;
-                                iBestCase = iCase;
-                            }
+                // check chaque grille pour la case
+                voisin[iCase] = bestColor; // change la couleur pour la comparer avec la liste tabou
+                bool isTabou = false;
+                for (int iCheckTabou = 0; iCheckTabou < grilleTabou[iCase].size(); iCheckTabou++) {
+                    isTabou = true;
+                    for (int i = 0; i < grilleTabou[iCase][iCheckTabou].size(); i++) {
+                        if (grilleTabou[iCase][iCheckTabou][i] != voisin[i]) {
+                            isTabou = false;
+                            break;
                         }
                     }
-                    else {
-                        /*if ((Color)iColor != tabouColor) {
-                            int tmpNbViol = 0;
-                            voisin[iCase] = (Color)iColor;
+                }
 
-                            for (int iCaseTest = 0; iCaseTest < getNbCase(); iCaseTest++) {
-                                tmpNbViol += countNbViolation(voisin, iCaseTest, voisin[iCaseTest]);
-                            }
+                if (!isTabou) {
+                    int tmpNbViol = 0;
+                    voisin[iCase] = bestColor;
 
-                            if (tmpNbViol < bestViol) {
-                                bestColorTab[iCase] = (Color)iColor;
-                                bestViol = tmpNbViol;
-                                bestVal = bestViol;
-                                iBestCase = iCase;
-                            }
-                        }*/
+                    for (int iCaseTest = 0; iCaseTest < getNbCase(); iCaseTest++) {
+                        tmpNbViol += countNbViolation(voisin, iCaseTest, voisin[iCaseTest]);
+                    }
+                    tmpNbViol /= 2;
+
+                    if (tmpNbViol < bestViol) {
+                        grilleTabou[iCase].push_back(voisin);
+                        bestViol = tmpNbViol;
+                        bestVal = bestViol;
+                        iBestCase = iCase;
+                        iBestGrille = grilleTabou[iCase].size() - 1; // le meilleur est forcément la dernière case
+                    }
+                }
+                // critère d'aspiration
+                else {
+                    int tmpNbViol = 0;
+                    voisin[iCase] = bestColor;
+
+                    for (int iCaseTest = 0; iCaseTest < getNbCase(); iCaseTest++) {
+                        tmpNbViol += countNbViolation(voisin, iCaseTest, voisin[iCaseTest]);
+                    }
+                    tmpNbViol /= 2;
+
+                    if (tmpNbViol < bestViol) {
+                        bestViol = tmpNbViol;
+                        bestVal = bestViol;
+                        iBestCase = iCase;
+                        iBestGrille = grilleTabou[iCase].size() - 1; // le meilleur est forcément la dernière case
                     }
                 }
 
@@ -613,23 +639,25 @@ void algo_recherche_tabou() {
         
         // etape 2
         // get best case
-        voisin = tab;
-        voisin[iBestCase] = grilleTabou[iBestCase];
-        int nbViolationTmp = 0;
-        for (int iCase = 0; iCase < getNbCase(); iCase++) {
-            nbViolationTmp += countNbViolation(voisin, iCase, voisin[iCase]);
-        }
-        nbViolationTmp /= 2;
+        if (iBestCase > -1 && iBestGrille > -1) {
+            voisin = tab;
+            voisin = grilleTabou[iBestCase][iBestGrille];
+            int nbViolationTmp = 0;
+            for (int iCase = 0; iCase < getNbCase(); iCase++) {
+                nbViolationTmp += countNbViolation(voisin, iCase, voisin[iCase]);
+            }
+            nbViolationTmp /= 2;
 
-        if (nbViolationTmp < nViolation) {
-            tab = voisin;
-            nViolation = nbViolationTmp;
+            if (nbViolationTmp < nViolation) {
+                tab = voisin;
+                nViolation = nbViolationTmp;
+            }
         }
-
+        std::cout << "iteration => " << nbIteration << std::endl;
         nbIteration++;
     }
     
+    nbViolation = nViolation;
     std::cout << "nbIteration => " << nbIteration << endl;
     std::cout << "SOLUTION_COURANTE => " << nViolation << endl;
-
 }
