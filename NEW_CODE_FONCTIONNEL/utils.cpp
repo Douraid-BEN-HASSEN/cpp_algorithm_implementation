@@ -81,6 +81,19 @@ int countNbViolation(vector<Color> pTab, int pCase, Color pColor) {
     return nViolation;
 }
 
+int countNbViolation(vector<Color> pTab) {
+    int nViolation = 0;
+    for (int iCase = 0; iCase < pTab.size(); iCase++) {
+        for (int iCaseInterdite = 0; iCaseInterdite < positionInterdite[iCase].size(); iCaseInterdite++) {
+            if (pTab[positionInterdite[iCase][iCaseInterdite]] == pTab[iCase]) {
+                nViolation++;
+            }
+        }
+    }
+
+    return nViolation/2;
+}
+
 int getRandomNumber(int max)
 {
     return rand() % max;
@@ -662,3 +675,108 @@ void algo_recherche_tabou() {
     std::cout << "nbIteration => " << nbIteration << endl;
     std::cout << "SOLUTION_COURANTE => " << nViolation << endl;
 }
+
+// ok
+vector<Color> algo_gww_random_walk(vector<Color> pTab) {
+    int random_value_1 = getRandomNumber(getNbCase() - 1);
+    int random_value_2 = getRandomNumber(getNbCase() - 1);
+    Color color_tmp = pTab[random_value_1];
+    pTab[random_value_1] = pTab[random_value_2];
+    pTab[random_value_2] = color_tmp;
+    return pTab;
+}
+
+void algo_gww() {
+    algo = "algo gww";
+
+    int nbParticule = 10;
+    int seuil = 80;
+    int nbRandomWalk = 10;
+
+    // etape 1 : init => remplir tab
+    srand(time(NULL));
+    bool remplie = false;
+    while (!remplie) {
+        remplie = true;
+
+        for (int iColor = 1; iColor < nCouleurDifferente + 1; iColor++) {
+            for (int iCase = 0; iCase < getNbCase(); iCase++) {
+                if (tab[iCase] == Color::EMPTY) {
+                    tab[iCase] = (Color)iColor;
+                    break;
+                }
+            }
+        }
+
+        for (int cpt = 0; cpt < tab.size(); cpt++) {
+            if (tab[cpt] == Color::EMPTY) {
+                remplie = false;
+                break;
+            }
+        }
+    }
+    // remplissage particule
+    vector<vector<Color>> grilleParticule;
+    vector<Color> particule = tab;
+
+    for (int i = 0; i < nbParticule; i++) {
+        int random_value_1 = getRandomNumber(getNbCase() - 1);
+        int random_value_2 = getRandomNumber(getNbCase() - 1);
+        Color color_tmp = particule[random_value_1];
+        particule[random_value_1] = particule[random_value_2];
+        particule[random_value_2] = color_tmp;
+        grilleParticule.push_back(particule);
+    }
+
+    int nbIteration = 0;
+    int maxIteration = 10000;
+    int bestSolution = 999;
+    vector<Color> bestTab;
+
+    while (bestSolution > 0 && nbIteration < maxIteration)
+    {
+        // faire un random walk sur chaque particule
+        for (int iParticule = 0; iParticule < grilleParticule.size(); iParticule++) {
+            for (int iRandomWalk = 0; iRandomWalk < nbRandomWalk; iRandomWalk++) {
+                grilleParticule[iParticule] = algo_gww_random_walk(grilleParticule[iParticule]);
+            }
+        }
+
+        // compter le nb de violation pour chaque particule
+        vector<vector<Color>> particulesValide;
+        vector<vector<Color>> particulesInvalide;
+
+        for (int iParticule = 0; iParticule < grilleParticule.size(); iParticule++) {
+            int nViolation = countNbViolation(grilleParticule[iParticule]);
+            if (nViolation < seuil) particulesValide.push_back(grilleParticule[iParticule]);
+            else particulesInvalide.push_back(grilleParticule[iParticule]);
+
+            if (nViolation < bestSolution) {
+                bestSolution = nViolation;
+                bestTab = grilleParticule[iParticule];
+            }
+        }
+
+        grilleParticule.clear();
+        grilleParticule = particulesValide;
+        if (grilleParticule.size()) {
+            for (int iParticulesInvalide = 0; iParticulesInvalide < particulesInvalide.size(); iParticulesInvalide++) {
+                particulesInvalide[iParticulesInvalide] =particulesValide[getRandomNumber(particulesValide.size())];
+                grilleParticule.push_back(particulesInvalide[iParticulesInvalide]);
+            }
+            seuil -= 1;
+        }
+        else {
+            grilleParticule = particulesInvalide;
+        }
+
+        //
+        nbIteration++;
+    }
+
+    tab = bestTab;
+    nbViolation = bestSolution;
+    std::cout << "seuil => " << seuil << endl;
+    std::cout << "SOLUTION => " << bestSolution << endl;
+}
+// ----
