@@ -8,23 +8,21 @@ string input_path = "Graphes/";
 string output_file_name = "output.txt";
 
 void FileWrite(string output_file);
+bool checkFile();
 
 int main()
 {
     init();
-
-    // algo_violation();
 
     // algo_recuit();
 
     // algo_descente();
     // algo_gsat();
     // algo_random_walk();
-    
-    algo_recherche_tabou();
+
+    // algo_recherche_tabou();    
 
     FileWrite(output_file_name);
-
 }
 
 void FileWrite(string output_file_name)
@@ -47,4 +45,14 @@ void FileWrite(string output_file_name)
     {
         cerr << "Impossible to write in the file !" << endl;
     }
+}
+
+bool checkFile() {
+    int nbViolationTmp = 0;
+    vector<Color> tab = readOutput("output.txt");
+    for (int iCase = 0; iCase < getNbCase(); iCase++) {
+        nbViolationTmp += countNbViolation(tab, iCase, tab[iCase]);
+    }
+    nbViolationTmp /= 2;
+    return nbViolationTmp == nbViolationTmp;
 }
