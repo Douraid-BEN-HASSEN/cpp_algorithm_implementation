@@ -19,7 +19,14 @@ enum Color {
 	ORANGE = 6,
 	NOIR = 7,
 	BLANC = 8,
-	ROSE = 9
+	ROSE = 9,
+	MARRON = 10,
+	GRIS = 11,
+	POURPRE = 12,
+	CYAN = 13,
+	MAGENTA = 14,
+	AZUR = 15,
+	OR = 16
 };
 
 void init();
