@@ -6,16 +6,18 @@ vector<Color> tab;
 string algo;
 
 int nCouleurDifferente = 10;
+string filePath = "Graphes/";
 string fileName = "queen10_10.col";
 int nbCase;
 int nbViolation = 0;
 
 void init() {
-    positionInterdite = readCol(fileName.c_str());
+    string fileNamePath = filePath + fileName;
+    positionInterdite = readCol(fileNamePath.c_str());
     std::fill_n(std::back_inserter(tab), getNbCase(), Color::EMPTY);
 }
 
-// +-------+
+// +-------+a
 // | UTILS |
 // +-------+
 std::vector<std::string> split(const std::string& s, char delim) {
