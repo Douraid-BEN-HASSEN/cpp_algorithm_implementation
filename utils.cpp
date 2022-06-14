@@ -44,18 +44,30 @@ vector<vector<int>> readCol(const char* pFile) {
         int indexActuel = -1;
         while (getline(f, line))
         {
+            indexActuel++;
             if (line[0] == 'p') {
                 nbCase = stoi(split(line, ' ')[2]);
+                vector<int> lVide;
+                std::fill_n(std::back_inserter(result), getNbCase(), lVide);
             }
             else if (line[0] == 'e') {
-                if ((indexActuel + 1) != stoi(split(line, ' ')[1])) {
-                    indexActuel = stoi(split(line, ' ')[1]) - 1;
-                    result.push_back({ stoi(split(line, ' ')[2]) - 1 });
-                }
-                else result[indexActuel].push_back(stoi(split(line, ' ')[2]) - 1);
+                result[stoi(split(line, ' ')[1]) - 1].push_back({ stoi(split(line, ' ')[2]) - 1 });
             }
         }
         f.close();
+    }
+    else {
+        std::cout << "File not opened !" << std::endl;
+    }
+
+    for (int i = 0; i < result.size(); i++) {
+        for (int j = 0; j < result.size(); j++) {
+            for (int a = 0; a < result[j].size(); a++) {
+                if (result[j][a] == i && std::count(result[i].begin(), result[i].end(), j) == 0) {
+                    result[i].push_back(j);
+                }
+            }
+        }
     }
 
     return result;
