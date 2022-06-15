@@ -19,14 +19,7 @@ enum Color {
 	ORANGE = 6,
 	NOIR = 7,
 	BLANC = 8,
-	ROSE = 9,
-	MARRON = 10,
-	GRIS = 11,
-	POURPRE = 12,
-	CYAN = 13,
-	MAGENTA = 14,
-	AZUR = 15,
-	OR = 16
+	ROSE = 9
 };
 
 void init();
@@ -42,6 +35,7 @@ int countNbViolation(vector<Color>);
 int getRandomNumber(int);
 vector<Color> readOutput(const char*);
 bool compareGrille(vector<Color>, vector<Color>);
+void FileWrite(string);
 
 // +--------+
 // | GETTER |
@@ -78,3 +72,12 @@ vector<Color> algo_genetique_get_best(vector<vector<Color>>);
 vector<vector<Color>> algo_genetique_mutation(vector<vector<Color>>);
 
 void algo_genetique();
+
+vector<Color> algo_recuit(vector<Color>, int&, int&);
+vector<Color> algo_random_walk(vector<Color>, int&, int&, int);
+vector<Color> algo_recherche_tabou(vector<Color>, int&, int&);
+vector<Color> algo_gww(vector<Color> pTab, int& pViolation, int& pnbIteration);
+vector<Color> algo_genetique(vector<Color>, int&, int&);
+
+void algo_hybride();
+void algo_hybride_partie_2();
