@@ -5,11 +5,13 @@ vector<Color> tab;
 
 string algo;
 
-int nCouleurDifferente = 17;
+int nCouleurDifferente = 44;
 string folder = "./DSJC/";
-string fileName = "DSJC125.5.col";
+string fileName = "DSJC125.9.col";
 int nbCase;
 int nbViolation = 0;
+
+string readFromOutput = "";
 
 void init() {
     positionInterdite = readCol((folder + fileName).c_str());
@@ -164,6 +166,15 @@ void FileWrite(string output_file_name)
     }
 }
 
+std::string ReplaceAll(std::string str, const std::string& from, const std::string& to) {
+    size_t start_pos = 0;
+    while ((start_pos = str.find(from, start_pos)) != std::string::npos) {
+        str.replace(start_pos, from.length(), to);
+        start_pos += to.length(); // Handles case where 'to' is a substring of 'from'
+    }
+    return str;
+}
+
 // +--------+
 // | GETTER |
 // +--------+
@@ -190,6 +201,25 @@ int getnCouleurDifferente() {
 
 string getFileName() {
     return fileName;
+}
+
+// +--------+
+// | SETTER |
+// +--------+
+void setnCouleurDifferente(int pnCouleurDifferente) {
+    nCouleurDifferente = pnCouleurDifferente;
+}
+
+void setFolder(string pFolder) {
+    folder = pFolder;
+}
+
+void setFilename(string pFilename) {
+    fileName = pFilename;
+}
+
+void setreadFromOutput(string pReadFromOutput) {
+    readFromOutput = pReadFromOutput;
 }
 
 // +------+
@@ -445,7 +475,7 @@ vector<Color> algo_recuit(vector<Color> pTab, int &pViolation, int &pnbIteration
         }
         pnbIteration++;
 
-        if (pnbIteration % 1000 == 0) {
+        if (pnbIteration % 100 == 0) {
             std::cout << "nbIteration => " << pnbIteration << std::endl;
             std::cout << "temperature => " << temperature << std::endl;
             std::cout << "xc => " << xc << std::endl;
@@ -706,7 +736,7 @@ void algo_random_walk() {
 vector<Color> algo_random_walk(vector<Color> pTab, int& pViolation, int& pnbIteration, int pMaxViolation)
 {
     
-    int maxIteration = 500000; //500000
+    int maxIteration = 200000; //500000
     int nFlip = 1;
     int meilleur_sol = pViolation;
     int meilleur_sol_courant = 99999;
@@ -748,6 +778,10 @@ vector<Color> algo_random_walk(vector<Color> pTab, int& pViolation, int& pnbIter
         if (x_courant < meilleur_sol) {
             meilleur_sol = x_courant;
             pTab = voisin;
+
+            nbViolation = meilleur_sol;
+            tab = pTab;
+            FileWrite("output_random_it_" + to_string(pnbIteration) + string("_") + ReplaceAll(ReplaceAll(fileName, ".col", ""), ".", "_") + ".txt");
         }
 
         if (x_courant < meilleur_sol_courant) {
@@ -756,18 +790,13 @@ vector<Color> algo_random_walk(vector<Color> pTab, int& pViolation, int& pnbIter
         }
 
         if (pnbIteration % 1000 == 0) {
+            if (nFlip > 1) nFlip--;
             std::cout << "nbIteration => " << pnbIteration << std::endl;
             std::cout << "SOLUTION => " << meilleur_sol << std::endl;
             std::cout << "SOLUTION COURANT => " << meilleur_sol_courant << std::endl;
         }
 
         pnbIteration++;
-
-        if (x_courant < pMaxViolation) {
-            pViolation = x_courant;
-            pTab = voisin;
-            return pTab;
-        }
     }
 
     pViolation = meilleur_sol;
@@ -1018,6 +1047,11 @@ vector<Color> algo_recherche_tabou(vector<Color> pTab, int& pViolation, int& pnb
             if (nbViolationTmp < nViolation) {
                 pTab = voisin;
                 nViolation = nbViolationTmp;
+
+                nbViolation = nViolation;
+                tab = pTab;
+                //FileWrite("./result/running/" + ReplaceAll(fileName, ".col", "") + "/output_it_" + to_string(pnbIteration) + string("_") + ReplaceAll(ReplaceAll(fileName, ".col", ""), ".", "_") + ".txt");
+                FileWrite("output_it_" + to_string(pnbIteration) + string("_") + ReplaceAll(ReplaceAll(fileName, ".col", ""), ".", "_") + ".txt");
             }
         }
 
@@ -1493,51 +1527,51 @@ vector<Color> algo_genetique(vector<Color> pTab, int& pViolation, int& pnbIterat
 void algo_hybride() {
     algo = "algo_hybride";
 
-    srand(time(NULL));
-    bool remplie = false;
+    int solution;
 
-    while (!remplie) {
-        remplie = true;
+    if (readFromOutput != "") {
+        tab = readOutput(readFromOutput.c_str());
+        solution = nbViolation;
+    }
+    else {
+        solution = 9999999;
+        srand(time(NULL));
+        bool remplie = false;
 
-        for (int iColor = 1; iColor < nCouleurDifferente + 1; iColor++) {
-            for (int iCase = 0; iCase < getNbCase(); iCase++) {
-                if (tab[iCase] == Color::EMPTY) {
-                    tab[iCase] = (Color)iColor;
+        while (!remplie) {
+            remplie = true;
+
+            for (int iColor = 1; iColor < nCouleurDifferente + 1; iColor++) {
+                for (int iCase = 0; iCase < getNbCase(); iCase++) {
+                    if (tab[iCase] == Color::EMPTY) {
+                        tab[iCase] = (Color)iColor;
+                        break;
+                    }
+                }
+            }
+
+            for (int cpt = 0; cpt < tab.size(); cpt++) {
+                if (tab[cpt] == Color::EMPTY) {
+                    remplie = false;
                     break;
                 }
             }
         }
 
-        for (int cpt = 0; cpt < tab.size(); cpt++) {
-            if (tab[cpt] == Color::EMPTY) {
-                remplie = false;
-                break;
-            }
+        int iSwap;
+        for (int iCase = 0; iCase < getNbCase(); iCase++) {
+            iSwap = getRandomNumber(getNbCase() - 1);
+            Color tempColor = tab[iCase];
+            tab[iCase] = tab[iSwap];
+            tab[iSwap] = tempColor;
         }
     }
 
-    int solution = 9999999;
     int nbIterationGlobal = 0;
     int nbIteration = 0;
 
-    
-
-    // recuit pour aller dans une solution local
-    /*tab = algo_recuit(tab, solution, nbIteration);
-    nbIterationGlobal += nbIteration;
-    nbIteration = 0;*/
-
-    // fin avec tabou
-    tab = algo_recherche_tabou(tab, solution, nbIteration);
-    nbIterationGlobal += nbIteration;
-    nbIteration = 0;
-
-    if (1 == 2) {
-        FileWrite("output.txt");
-    }
-
-    // degradation random walk
-    tab = algo_random_walk(tab, solution, nbIteration, 50);
+ 
+    tab = algo_random_walk(tab, solution, nbIteration, -1);
     nbIterationGlobal += nbIteration;
     nbIteration = 0;
 
@@ -1551,7 +1585,8 @@ void algo_hybride() {
 
     nbViolation = solution;
 
-    FileWrite("output.txt");
+    FileWrite("output_" + ReplaceAll(ReplaceAll(fileName, ".col", ""), ".", "_") + ".txt");
+    
 }
 
 void algo_hybride_partie_2() {
