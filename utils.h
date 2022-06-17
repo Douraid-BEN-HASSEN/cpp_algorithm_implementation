@@ -36,6 +36,7 @@ int getRandomNumber(int);
 vector<Color> readOutput(const char*);
 bool compareGrille(vector<Color>, vector<Color>);
 void FileWrite(string);
+std::string ReplaceAll(std::string, const std::string&, const std::string&);
 
 // +--------+
 // | GETTER |
@@ -46,6 +47,14 @@ string getAlgo();
 vector<Color> getTab();
 int getnCouleurDifferente();
 string getFileName();
+
+// +--------+
+// | SETTER |
+// +--------+
+void setnCouleurDifferente(int);
+void setFolder(string);
+void setFilename(string);
+void setreadFromOutput(string);
 
 // +------+
 // | ALGO |
